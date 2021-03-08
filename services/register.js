@@ -3,6 +3,10 @@ const bcrypt =  require('bcrypt');
 
 
 async function register(req) {
+    if(req.body.password == "" || req.body.user_name == ""){
+        var msg ="You didnt enter username or password";
+        return msg;
+    }
     
     const salt = await bcrypt.genSalt();
     const hashdPassword = await bcrypt.hash(req.body.password, salt)
