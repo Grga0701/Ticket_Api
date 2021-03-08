@@ -18,24 +18,32 @@ async function login(req, res) {
     })
     const username = req.body.user_name
     const curentuser = {user_name: username}
-    bcrypt.compare(req.body.passowrd, user.password,function(err, result){
+    await bcrypt.compare(req.body.password, user.password, function(err, result){
+        if(err){
+            res.sendStatus(500);
+        }
+        if(result== true){
+            const accessToken = generateAccessToken(curentuser)
+            const refreshToken = jwt.sign(curentuser, process.env.REFRESH_TOKEN_SECRET)
+    
+            const user_token = new User_token({
+                user_name: username,
+                refresh_token: refreshToken
+            })
+            user_token.save()
+            .then((result)=>{
+                return result;
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+    
+            return res.json({accessToken: accessToken, refreshToken: refreshToken})
+        }else{
+            res.send("incorect password");
+        }
         
-        const accessToken = generateAccessToken(curentuser)
-        const refreshToken = jwt.sign(curentuser, process.env.REFRESH_TOKEN_SECRET)
 
-        const user_token = new User_token({
-            user_name: username,
-            refresh_token: refreshToken
-        })
-        user_token.save()
-        .then((result)=>{
-            return result;
-        })
-        .catch((err)=>{
-            console.log(err)
-        })
-
-        return res.json({accessToken: accessToken, refreshToken: refreshToken})
     })  
 };
 
