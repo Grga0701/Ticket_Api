@@ -24,6 +24,8 @@ async function register(req) {
         .catch((err)=>{
             console.log(err)
         })
+    msg ="You have been registerd";
+    return msg;
 
 };
 
